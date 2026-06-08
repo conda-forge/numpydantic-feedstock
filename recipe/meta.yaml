@@ -1,5 +1,5 @@
 {% set name = "numpydantic" %}
-{% set version = "1.9.0" %}
+{% set version = "1.9.1" %}
 
 package:
   name: {{ name|lower }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/numpydantic-{{ version }}.tar.gz
-  sha256: 8535fda0f7ddf6434c9ffc15a6f5c07cd2899074fc08cbc64e4b219eb8c708a7
+  sha256: d1f50f0e291bc1d4a93751bfedc95fcd0df0608667d44c0ae33434668c1a91cd
 
 build:
   noarch: python
