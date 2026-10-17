@@ -8,20 +8,26 @@ context:
   numpy_min: "2.0.0"
   # check solve/import/check with a specific version of python instead of `*` (read: some python)
   python_check_max: "3.15"
+  # tests that rely on specific type checker version outputs
+  unlink_tests: test_pyright.py test_mypy.py
 
 package:
   name: numpydantic
   version: ${{ version }}
 
 source:
-  url: https://files.pythonhosted.org/packages/source/n/numpydantic/numpydantic-${{ version }}.tar.gz
-  sha256: a17d5ccc3b893c4a2e539c81c2f18960d70884ad7fcaa09c9eb56a95e8daf4a3
+  - url: https://files.pythonhosted.org/packages/source/n/numpydantic/numpydantic-${{ version }}.tar.gz
+    sha256: a17d5ccc3b893c4a2e539c81c2f18960d70884ad7fcaa09c9eb56a95e8daf4a3
+  - target_directory: src/numpydantic/vendor/nptyping
+    url: https://raw.githubusercontent.com/ramonhagenaars/nptyping/refs/tags/v2.5.0/LICENSE
+    sha256: c9592e4cc7ac9023931008a31cf278ba39a4619b82ec5d045ba069fc3ac81a7b
 
 build:
   number: 1
   noarch: python
   script:
     - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check --check-build-dependencies
+    - ${{ PYTHON }} -c "import os; [os.unlink(f'tests/{p}') for p in '''${{ unlink_tests }}'''.split()]"
 
 requirements:
   host:
@@ -50,16 +56,17 @@ tests:
         - ${{ python_check_max }}.*
   - files:
       source:
+        - pyproject.toml
         - tests/**
     requirements:
       run:
         - pytest >=7.4.0
-        # all the functional [extras]; add to `requirements/extras` when CEP-44 is ready
+        - pytest-cov >=4.1.0
+        # all the runtime [extras]; add to `requirements/extras` when CEP-44 is ready
         - dask >=2024.4.0
         - h5py >=3.10.0
-        - opencv-python >=4.9.0.80
+        - opencv >=4.9.0.80
         - zarr >=2.17.2,<3.0.0
-        - mypy >=1.17.1
         # for extra floor pip check
         - pip
         - python ${{ python_min }}.*
@@ -73,7 +80,9 @@ about:
   summary: |-
     Type and shape validation and serialization for arbitrary array types in pydantic models
   license: MIT
-  license_file: LICENSE
+  license_file:
+    - LICENSE
+    - src/numpydantic/vendor/nptyping/LICENSE
   homepage: https://pypi.org/project/numpydantic
   repository: https://github.com/p2p-ld/numpydantic
   documentation: https://numpydantic.readthedocs.io
