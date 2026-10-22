@@ -73,8 +73,11 @@ tests:
         - numpy ${{ numpy_min }}.*
         - pydantic ${{ pydantic_min }}.*
     script:
-      - pip check
-      - pytest -vv --tb=long --color=yes
+      env:
+        NUMCODECS_ALLOW_UNSAFE_PICKLE_DECODE: "1"
+      content:
+        - pip check
+        - pytest -vv --tb=long --color=yes
 
 about:
   summary: |-
